@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.navigation.android.maps3">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -27,7 +28,8 @@
             android:name=".ViewContacts"
             android:label="Your Contacts" />
         <activity android:name=".ContactDetailsActivity" />
-        <activity android:name=".CreateGroupsActivity"></activity>
+        <activity android:name=".CreateGroupsActivity" />
+        <activity android:name=".MapsActivity"></activity>
     </application>
 
 </manifest>
