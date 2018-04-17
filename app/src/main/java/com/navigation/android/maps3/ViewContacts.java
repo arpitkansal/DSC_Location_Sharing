@@ -30,6 +30,8 @@ public class ViewContacts extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listview_contact);
 
+
+
     }
     @Override
     protected void onResume()
@@ -40,6 +42,9 @@ public class ViewContacts extends AppCompatActivity {
         DB = database.getDB();
 
         Log.d("act", "view contact");
+
+
+
 
         ContactsDBHelper dbHelper = new ContactsDBHelper(this);
         DB = dbHelper.getWritableDatabase();
@@ -63,6 +68,30 @@ public class ViewContacts extends AppCompatActivity {
                 Log.d("id", Integer.toString(id));
                 intent.putExtra("contact_id", id);
                 startActivity(intent);
+            }
+        });
+
+        listView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+//                Intent intent = getIntent();
+//                int id = intent.getIntExtra("coords_id", 0);
+//
+//                Cursor cursorCoords = DB.rawQuery("SELECT * FROM COORDINATES WHERE _id = " + id, null);
+//
+//                Log.d("id in vw", Integer.toString(id));
+//                cursorCoords.moveToFirst();
+//
+//                String s_latitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLatitude));
+//                String s_longitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLongitude));
+//                String msgToSend = s_latitude + " , " + s_longitude;
+//                Log.d("Msg to be send", msgToSend);
+//                Intent msgSend = new Intent();
+//                msgSend.putExtra(msgToSend,0);
+//                startActivity(msgSend);
+               // Toast.makeText(this, "Why did you do that? That REALLY hurts!!!", Toast.LENGTH_LONG).show();
+               Toast.makeText(getApplicationContext(),"good",Toast.LENGTH_LONG).show();
+                return true;
             }
         });
     }

@@ -1,6 +1,8 @@
 package com.navigation.android.maps3;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +29,11 @@ public class CheckpPoints extends AppCompatActivity {
     private Button mTripButton, mAddCheckpoint;
     public static boolean firstAdd = true;
 
+
+    private SQLiteDatabase DB = null;
+    private DataBase database;
+    private ListView listViewCoordsDB;
+
     public static void setFirstAdd(boolean firsttAdd) {
         CheckpPoints.firstAdd = firsttAdd;
     }
@@ -41,10 +48,14 @@ public class CheckpPoints extends AppCompatActivity {
         mLocationsList = new ArrayList<>();
         checkpointListView = findViewById(R.id.checkpoints_list);
 
+
+
         mTripButton = findViewById(R.id.make_trip);
         mAddCheckpoint = findViewById(R.id.add_checkpoint);
 //        mPlacesList.add("Add checkpoints");
 //        mLocationsList.add(new LatLng(0, 0));
+
+        listViewCoordsDB = (ListView) findViewById(R.id.listview_coords_db);
 
         mAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, mPlacesList);
         checkpointListView.setAdapter(mAdapter);
@@ -85,12 +96,51 @@ public class CheckpPoints extends AppCompatActivity {
             public void onClick(View v) {
                 mLocationsList.clear();
                 mPlacesList.clear();
+
+                DB.execSQL("DELETE FROM COORDINATES");
 //                mPlacesList.add("Add checkpoints");
 //                mLocationsList.add(new LatLng(0, 0));
                 mAdapter.notifyDataSetChanged();
 
             }
         });
+
+    }
+
+    protected void onResume() {
+        super.onResume();
+        //GET THE DATABSE HERE
+        database = new DataBase(getApplicationContext());
+        DB = database.getDB();
+
+        Log.d("act", "view Coords");
+
+        ContactsDBHelper dbHelper = new ContactsDBHelper(this);
+        DB = dbHelper.getWritableDatabase();
+        final Cursor cursor = DB.rawQuery("SELECT * FROM COORDINATES", null);
+
+        while (cursor.moveToNext()) {
+            Log.d("cursor", cursor.getString(cursor.getColumnIndexOrThrow(ContactsDBHelper.colLatitude)));
+        }
+
+       CoordsCursorAdapter coordsCursorAdapter = new CoordsCursorAdapter(this,cursor);
+
+// Attach cursor adapter to the ListView
+        listViewCoordsDB.setAdapter(coordsCursorAdapter);
+
+        coordsCursorAdapter.changeCursor(cursor);
+
+        listViewCoordsDB.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                                Intent intent = new Intent(getApplicationContext(), ViewContacts.class);
+                                                int id = (int) view.getTag();
+                                                Log.d("id", Integer.toString(id));
+                                                intent.putExtra("coords_id", id);
+                                                startActivity(intent);
+                                            }
+                                        }
+        );
 
     }
 }

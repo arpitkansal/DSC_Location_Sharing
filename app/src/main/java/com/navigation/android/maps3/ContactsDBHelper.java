@@ -21,8 +21,8 @@ public class ContactsDBHelper extends SQLiteOpenHelper {
     public static final String colEmail = "Email";
     public static final String colPhone = "Phone";
 
-    public static final String coordinatesTable = "Coordinates";
-    public static final String colCoordinateID = "_cid";
+    public static final String coordinatesTable = "COORDINATES";
+    public static final String colCoordinateID = "_id";
     public static final String colLatitude = "Latitude";
     public static final String colLongitude = "Longitude";
 
