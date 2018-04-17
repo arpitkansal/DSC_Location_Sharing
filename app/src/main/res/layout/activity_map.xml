@@ -25,6 +25,13 @@ tools:context="com.navigation.android.maps3.MapActivity">
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/add_member_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Add Member"
+                android:layout_height="wrap_content" />
+
+            <Button
                 android:id="@+id/renew_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -32,6 +39,19 @@ tools:context="com.navigation.android.maps3.MapActivity">
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
+        <EditText
+            android:id="@+id/member_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:hint="Name"/>
+
+        <EditText
+            android:id="@+id/member_contact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Contact"/>
 
         <ScrollView
             android:layout_width="match_parent"

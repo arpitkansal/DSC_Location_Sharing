@@ -16,11 +16,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    public void OpenMaps(View v)
-    {
-        Intent intent = new Intent(this, MapActivity.class);
-        startActivity(intent);
-    }
+//    public void OpenMaps(View v)
+//    {
+//        Intent intent = new Intent(this, MapsActivity2.class);
+//        startActivity(intent);
+//    }
     public void AddContacts(View v)
     {
         Intent intent = new Intent(this, AddContactsActivity.class);
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void openmapsActivity(View v){
-        Intent intent = new Intent(this, MapActivity.class);
+        Intent intent = new Intent(this, CheckpPoints.class);
         startActivity(intent);
     }
 }

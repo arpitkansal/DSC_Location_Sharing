@@ -1,22 +1,25 @@
 package com.navigation.android.maps3;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,7 +37,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallback {
+
+    private SQLiteDatabase DB = null;
+    private DataBase database;
+    private Button add_checkpoints;
 
     private GoogleMap mMap;
     private LocationManager mLocationManager;
@@ -48,22 +55,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<String> checkpointNames;
     private LatLng origin, destination;
     private String url;
+    private String coordl1,coordl2;
+    private Double l1,l2;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        database = new DataBase(getApplicationContext());
+        DB = database.getDB();
         addressList = new ArrayList<Address>();
         intent = getIntent();
-        checkpoints = MapActivity.locations;
-        checkpointNames = MapActivity.placesList;
+        checkpoints = CheckpPoints.mLocationsList;
+        checkpointNames = CheckpPoints.mPlacesList;
+        LatLng latLng = new LatLng(0,0) ;
     }
 
 
@@ -93,31 +103,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    @SuppressLint("MissingPermission")
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap)
+    {
         mMap = googleMap;
+
         int positon = intent.getIntExtra("position", 0);
-        MapActivity.setFirsttAdd(false);
+        CheckpPoints.setFirstAdd(false);
 
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         mLocationListener = new LocationListener() {
             @Override
-            public void onLocationChanged(Location location) {
-            }
-
+            public void onLocationChanged(Location location) {}
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-            }
-
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
             @Override
-            public void onProviderEnabled(String s) {
-            }
-
+            public void onProviderEnabled(String s) {}
             @Override
-            public void onProviderDisabled(String s) {
-            }
+            public void onProviderDisabled(String s) {}
         };
+
+//        if (CheckpPoints.mLocationsList.size() >= 3){
+//            origin = CheckpPoints.mLocationsList.get(1);
+//            destination = CheckpPoints.mLocationsList.get(2);
+//            startDownload();
+//        }
+        if (CheckpPoints.mLocationsList.size() >= 2){
+            origin = CheckpPoints.mLocationsList.get(0);
+            destination = CheckpPoints.mLocationsList.get(1);
+            startDownload();
+        }
 
         // checking the version to request GPS permission from the user
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -137,8 +162,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
 
+//        // checking if no checkpoint is added
+//        if (positon == 0 && intent.getIntExtra("first", 0) == 1) {
+//
+//            LatLng loc;
+//            if (mLastLocation != null) {
+//                loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//            } else {
+//                loc = new LatLng(28.7041, 77.1025);
+//            }
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 11));
+//
+//        } else if (positon == 0 && intent.getIntExtra("first", 0) != 1) {
+//
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CheckpPoints.mLocationsList.get(1), 11));
+//            plot();
+//        }
+//        // if elment from the list other than that present at 0th index is clicked than show that place on the map
+//        else {
+//
+//            LatLng placeLocation = CheckpPoints.mLocationsList.get(positon);
+//            String placeName = CheckpPoints.mPlacesList.get(positon);
+//            plot();
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 12));
+//        }
+
+
+
+
+
         // checking if no checkpoint is added
-        if (positon == 0 && intent.getIntExtra("first", 0) == 1) {
+        if (CheckpPoints.mLocationsList.size() == 0) {
 
             LatLng loc;
             if (mLastLocation != null) {
@@ -148,19 +202,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 11));
 
-        } else if (positon == 0 && intent.getIntExtra("first", 0) != 1) {
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MapActivity.locations.get(1), 11));
-            plot();
         }
+//        else if (positon == 0 && intent.getIntExtra("first", 0) != 1) {
+//
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CheckpPoints.mLocationsList.get(1), 11));
+//            plot();
+//        }
         // if elment from the list other than that present at 0th index is clicked than show that place on the map
         else {
 
-            LatLng placeLocation = MapActivity.locations.get(positon);
-            String placeName = MapActivity.placesList.get(positon);
+
+            LatLng placeLocation = CheckpPoints.mLocationsList.get(CheckpPoints.mLocationsList.size()-1);
+            String placeName = CheckpPoints.mPlacesList.get(positon);
             plot();
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 12));
         }
+
+
+
 
         // adding a marker on clicking the map at the clicked point
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -190,6 +249,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     e.printStackTrace();
                 }
 
+
+
+
+
                 if (address == "") {
 
                     SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm  dd-mm-yyyy");
@@ -200,34 +263,87 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 options.position(latLng)
                         .title(address);
 
-                if (MapActivity.placesList.size() == 1) {
+//                if (CheckpPoints.mPlacesList.size() == 1) {
+//                    origin = latLng;
+//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                } else if (CheckpPoints.mPlacesList.size() == 2) {
+//                    destination = latLng;
+//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+//                } else {
+//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+//                }
+
+
+
+                if (CheckpPoints.mPlacesList.size() == 0) {
                     origin = latLng;
+                    l1 = latLng.latitude;
+                    l2 = latLng.longitude;
+
+                    coordl1 = l1.toString();
+                    coordl2 = l2.toString();
+                    l1 = Double.parseDouble(coordl1);
+                    l2 = Double.parseDouble(coordl2);
+
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                } else if (MapActivity.placesList.size() == 2) {
+                } else if (CheckpPoints.mPlacesList.size() == 1) {
                     destination = latLng;
+                    l1 = latLng.latitude;
+                    l2 = latLng.longitude;
+
+                    coordl1 = l1.toString();
+                    coordl2 = l2.toString();
+                    l1 = Double.parseDouble(coordl1);
+                    l2 = Double.parseDouble(coordl2);
+
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                 } else {
+                    l1 = latLng.latitude;
+                    l2 = latLng.longitude;
+
+                    coordl1 = l1.toString();
+                    coordl2 = l2.toString();
+                    l1 = Double.parseDouble(coordl1);
+                    l2 = Double.parseDouble(coordl2);
+
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 }
+
+
+                String SQLSTATE;
+                ContentValues cvContact = new ContentValues();
+                cvContact.put(ContactsDBHelper.colLatitude, l1);
+                cvContact.put(ContactsDBHelper.colLongitude, l2);
+                DB.insert("COORDINATES", null, cvContact);
+                Log.d("Cords", "saved");
+//
 
 
                 // adding a marker at the clicked positon
                 mMap.addMarker(options);
                 Toast.makeText(getApplicationContext(), "Location saved", Toast.LENGTH_SHORT).show();
-                MapActivity.placesList.add(address);
-                MapActivity.locations.add(latLng);
-                MapActivity.adapter.notifyDataSetChanged();
+                CheckpPoints.mPlacesList.add(address);
+                CheckpPoints.mLocationsList.add(latLng);
+                CheckpPoints.mAdapter.notifyDataSetChanged();
 
-                if (origin != null && destination != null) {
-                    url = getUrl(origin, destination);
-                    Log.e("URL is", url);
 
-                    MyDownloadTask downloadTask = new MyDownloadTask(mMap);
-                    downloadTask.execute(url);
+//                if (CheckpPoints.mLocationsList.size() == 3) {
+//                    startDownload();
+//                }
+                if (CheckpPoints.mLocationsList.size() == 2) {
+                    startDownload();
                 }
             }
         });
 
+    }
+
+    // helper method to get url and start background task to download data from url
+    private void startDownload (){
+        url = getUrl(origin, destination);
+        Log.e("URL is", url);
+        MyDownloadTask downloadTask = new MyDownloadTask(mMap, getApplicationContext());
+        downloadTask.execute(url);
     }
 
     // helper method to generate URL
@@ -245,19 +361,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void plot() {
-        for (int i = 1; i < checkpoints.size(); i++) {
+//        for (int i = 1; i < checkpoints.size(); i++) {
+        for (int i = 0; i < checkpoints.size(); i++) {
 
             // adding a marker at the clicked positon
             MarkerOptions options = new MarkerOptions();
             options.position(checkpoints.get(i))
                     .title(checkpointNames.get(i));
 
-            if (i == 1) {
+//            if (i == 1) {
+//                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                origin = checkpoints.get(1);
+//            } else if (i == 2) {
+//                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+//                destination = checkpoints.get(2);
+//            } else {
+//                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+//            }
+
+            if (i == 0) {
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                origin = checkpoints.get(1);
-            } else if (i == 2) {
+                origin = checkpoints.get(0);
+            } else if (i == 1) {
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                destination = checkpoints.get(2);
+                destination = checkpoints.get(1);
             } else {
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
             }
@@ -268,16 +395,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (origin != null && destination != null) {
-            url = getUrl(origin, destination);
-            Log.e("URL is", url);
-            MyDownloadTask downloadTask = new MyDownloadTask(mMap);
-            downloadTask.execute(url);
+            startDownload();
         }
     }
+//    protected void onResume()
+//    {
+//        super.onResume();
+//        database = new DataBase(getApplicationContext());
+//        DB = database.getDB();
+//
+//    }
+    public  void onResume() {
+    super.onResume();
 
+
+    }
     @Override
     protected void onPause() {
         super.onPause();
         mMap.clear();
     }
+
 }

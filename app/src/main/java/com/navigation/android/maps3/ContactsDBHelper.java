@@ -21,6 +21,11 @@ public class ContactsDBHelper extends SQLiteOpenHelper {
     public static final String colEmail = "Email";
     public static final String colPhone = "Phone";
 
+    public static final String coordinatesTable = "Coordinates";
+    public static final String colCoordinateID = "_cid";
+    public static final String colLatitude = "Latitude";
+    public static final String colLongitude = "Longitude";
+
     ContactsDBHelper(Context context)
     {
         super(context,DB_NAME,null,DB_VERSION);
@@ -29,14 +34,23 @@ public class ContactsDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //CREATE YOUR TABLES HERE... SIMPLE SQL
+
         db.execSQL("CREATE TABLE IF NOT EXISTS " + contactTable + "("
                 + colID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
                 + colName + " TEXT , "
                 + colEmail + " TEXT , "
                 + colPhone + " INTEGER);");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + coordinatesTable + "( "
+            + colCoordinateID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
+            + colLatitude + " FLOAT , "
+            + colLongitude + " FLOAT);");
+
+
+
+
     }
-
-
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onCreate(db);

@@ -1,8 +1,10 @@
 package com.navigation.android.maps3;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,10 +24,11 @@ import java.util.List;
 public class ParseResponseData extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
 
     private GoogleMap mMap;
+    private Context context;
 
-
-    public ParseResponseData(GoogleMap mMap){
+    public ParseResponseData(GoogleMap mMap, Context context){
         this.mMap = mMap;
+        this.context = context;
     }
 
     // parsing the data downloaded in JSON form
@@ -80,7 +83,14 @@ public class ParseResponseData extends AsyncTask<String, Void, List<List<HashMap
             polylineOptions.geodesic(true);
 
         }
-        mMap.addPolyline(polylineOptions);
+
+        if (polylineOptions != null && this.mMap!= null) {
+            mMap.addPolyline(polylineOptions);
+        }else {
+            Log.e("polylines", String.valueOf(polylineOptions));
+            Log.e("map", String.valueOf(this.mMap));
+            Toast.makeText(context, "Unable to plot route Try Again!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 }

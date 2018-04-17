@@ -1,5 +1,6 @@
 package com.navigation.android.maps3;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,8 +20,10 @@ import java.net.URL;
 public class MyDownloadTask extends AsyncTask<String, Void, String> {
 
     private GoogleMap myMap;
-    MyDownloadTask(GoogleMap map){
+    private Context context;
+    MyDownloadTask(GoogleMap map, Context context){
         this.myMap = map;
+        this.context = context;
     }
 
     // downloading data from the given url in background
@@ -43,7 +46,7 @@ public class MyDownloadTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         Log.e("onPostExecute", "recieved result");
-        ParseResponseData parseResponseData = new ParseResponseData(this.myMap);
+        ParseResponseData parseResponseData = new ParseResponseData(this.myMap, this.context);
         parseResponseData.execute(result);
     }
 
