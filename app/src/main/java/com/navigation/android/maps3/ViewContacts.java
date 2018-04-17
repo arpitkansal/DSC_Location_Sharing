@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,33 +64,58 @@ public class ViewContacts extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getApplicationContext(), ContactDetailsActivity.class);
-                int id = (int) view.getTag();
-                Log.d("id", Integer.toString(id));
-                intent.putExtra("contact_id", id);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), ContactDetailsActivity.class);
+//                int id = (int) view.getTag();
+//                Log.d("id", Integer.toString(id));
+//                intent.putExtra("contact_id", id);
+//                startActivity(intent);
+//
+
+                Intent intent = getIntent();
+                int id = intent.getIntExtra("coords_id", 0);
+
+                Cursor cursorCoords = DB.rawQuery("SELECT * FROM COORDINATES WHERE _id = " + id, null);
+
+                Log.d("id in vw", Integer.toString(id));
+                cursorCoords.moveToFirst();
+
+                String s_latitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLatitude));
+                String s_longitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLongitude));
+                String msgToSend = s_latitude + " , " + s_longitude;
+                Log.d("msg",msgToSend);
+                String phoneno = cursor.getString(cursor.getColumnIndexOrThrow(ContactsDBHelper.colPhone));
+                Log.d("Phn_no",phoneno);
+
+                Intent smsIntent = new Intent(Intent.ACTION_SEND);
+
+                smsIntent.setData(Uri.parse("smsto:"));
+                smsIntent.setType("vnd.android-dir/mms-sms");
+                smsIntent.putExtra("address"  , new String ("01234"));
+                smsIntent.putExtra("sms_body"  , "Test ");
+                //startActivity(smsIntent);
+
+
             }
         });
 
         listView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-//                Intent intent = getIntent();
-//                int id = intent.getIntExtra("coords_id", 0);
-//
-//                Cursor cursorCoords = DB.rawQuery("SELECT * FROM COORDINATES WHERE _id = " + id, null);
-//
-//                Log.d("id in vw", Integer.toString(id));
-//                cursorCoords.moveToFirst();
-//
-//                String s_latitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLatitude));
-//                String s_longitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLongitude));
-//                String msgToSend = s_latitude + " , " + s_longitude;
-//                Log.d("Msg to be send", msgToSend);
-//                Intent msgSend = new Intent();
-//                msgSend.putExtra(msgToSend,0);
-//                startActivity(msgSend);
-               // Toast.makeText(this, "Why did you do that? That REALLY hurts!!!", Toast.LENGTH_LONG).show();
+                Intent intent = getIntent();
+                int id = intent.getIntExtra("coords_id", 0);
+
+                Cursor cursorCoords = DB.rawQuery("SELECT * FROM COORDINATES WHERE _id = " + id, null);
+
+                Log.d("id in vw", Integer.toString(id));
+                cursorCoords.moveToFirst();
+
+                String s_latitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLatitude));
+                String s_longitude = cursorCoords.getString(cursorCoords.getColumnIndexOrThrow(ContactsDBHelper.colLongitude));
+                String msgToSend = s_latitude + " , " + s_longitude;
+                Log.d("Msg to be send", msgToSend);
+                Intent msgSend = new Intent(Intent.ACTION_VIEW, Uri.parse("To Reach : " + msgToSend));
+                msgSend.putExtra(msgToSend,0);
+                startActivity(msgSend);
                Toast.makeText(getApplicationContext(),"good",Toast.LENGTH_LONG).show();
                 return true;
             }
