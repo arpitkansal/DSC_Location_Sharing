@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -24,12 +25,19 @@ public class ViewContacts extends AppCompatActivity {
     private DataBase database;
     private ListView listView;
     private TextView contactName;
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_contacts);
 
         listView = (ListView) findViewById(R.id.listview_contact);
+        Button deleteAllContact = (Button)findViewById(R.id.button_delete_all);
+
+        deleteAllContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DB.execSQL("DELETE FROM CONTACTS");
+            }
+        });
 
 
 
@@ -61,6 +69,7 @@ public class ViewContacts extends AppCompatActivity {
 
         contactCursorAdapter.changeCursor(cursor);
 
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -87,11 +96,9 @@ public class ViewContacts extends AppCompatActivity {
                 Log.d("Phn_no",phoneno);
 
                 Intent smsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"+phoneno));
-                smsIntent.putExtra("sms Body", msgToSend);
-                smsIntent.putExtra("address"  , new String ("01234"));
-
+                smsIntent.putExtra("sms", "28.5984,25.3654");
                 startActivity(smsIntent);
-
+//                startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts(msgToSend, phoneno, null)));
 
             }
         });

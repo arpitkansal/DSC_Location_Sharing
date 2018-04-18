@@ -22,6 +22,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,7 +52,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     private LocationListener mLocationListener;
     private List<Address> addressList;
     private Geocoder geocoder;
-    private Location mLastLocation;
+    public static Location mLastLocation;
     private int showMarker = 0;
     private Intent intent;
     private List<LatLng> checkpoints;
@@ -63,7 +67,21 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        PlaceAutocompleteFragment placeAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete);
+        placeAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                searchAction(place.getLatLng());
+                Log.d("Maps", "Place selected: " + place.getName());
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.d("Maps", "An error occurred: " + status);
+            }
+        });
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -74,6 +92,11 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         checkpoints = CheckpPoints.mLocationsList;
         checkpointNames = CheckpPoints.mPlacesList;
         LatLng latLng = new LatLng(0,0) ;
+    }
+
+    private void searchAction(LatLng add) {
+        SearchTask searchTask = new SearchTask(mMap, getApplicationContext());
+        searchTask.execute(add);
     }
 
 

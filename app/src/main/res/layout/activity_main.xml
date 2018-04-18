@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.navigation.android.maps3.MainActivity">
+    tools:context="com.navigation.android.maps3.MainActivity"
+    android:background="@drawable/world"
+    android:alpha="0.7">
 
     <Button
         android:id="@+id/button"
@@ -15,21 +17,11 @@
         android:layout_marginTop="128dp"
         android:onClick="AddContacts"
         android:text="Add Contacts"
+        android:background="@drawable/button_style"
         app:layout_constraintBottom_toTopOf="@+id/button3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--<Button-->
-        <!--android:id="@+id/button2"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Create Group"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="0.141"-->
-        <!--app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:layout_constraintVertical_bias="0.498" />-->
 
     <Button
         android:id="@+id/button3"
@@ -38,6 +30,7 @@
         android:layout_marginBottom="204dp"
         android:onClick="openmapsActivity"
         android:text="Navigate Maps"
+        android:background="@drawable/button_style"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -53,6 +46,7 @@
         android:layout_marginTop="128dp"
         android:onClick="viewContacts"
         android:text="View Contacts"
+        android:background="@drawable/button_style"
         app:layout_constraintBottom_toTopOf="@+id/button3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.425"

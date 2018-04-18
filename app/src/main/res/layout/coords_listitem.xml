@@ -14,8 +14,10 @@ tools:context="com.navigation.android.maps3.CheckpPoints">
 
     <TextView
         android:id="@+id/listitem_coords"
+        android:textSize="30dp"
         android:layout_width="match_parent"
-        android:layout_height="42dp" />
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>
 
